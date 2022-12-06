@@ -1,0 +1,342 @@
+h1{
+	color:#535074;
+	font-family: 'Signika';/*'Omnes Semibold','Signika', sans-serif;*/
+	font-weight:normal;
+	font-size:3.1rem;
+}
+
+img.portada{
+	margin: 100px 0 0 100px;
+}
+
+h1 > span{
+	color: #80b6e6 !important;
+	font-size:3.1rem;
+}
+
+.titulo{
+	margin: 100px 0px 0 110px;
+	text-align: right;
+}
+
+#title{
+	margin-left: -110px;
+}
+
+.crypto{
+	margin: -50px 0 -45px 190px !important;
+	width: 260px;
+}
+
+hr{
+	width: 10%;
+}
+
+.h2{
+	font-weight:normal;
+	font-size:1rem;
+	color:#373737;
+}
+
+h2{
+	font-size:36px;
+	color: #413e66;
+	font-weight: 700;
+}
+
+.titulo > p{
+    margin: auto;
+    font-size: 15px;
+    padding-bottom: 60px;
+    color: #535074;
+}
+
+p{
+    margin: auto;
+    font-size: 15px;
+    color: #535074;
+}
+
+.process{
+	font-size: 24px;
+	color: #413e66;
+}
+
+.media > i{
+	font-size: 30px;
+}
+
+p > i{
+	font-size: 30px;
+}
+
+header{
+	position: relative;
+	height: 50%;
+}
+
+form{
+	justify-content: center;
+}
+/* =============================================================================
+   INPUT
+   ========================================================================== */
+
+.content-input input,
+.content-select select{
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+}
+
+
+.separator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.separator_line {
+    width: 50%;
+    max-width: 368px;
+    height: 2px;
+    background-color: #e7f5e9;
+}
+
+.borde_cambio:after {
+    width: 5px;
+    height: 55px;
+    background: #d0f5da;
+    border-radius: 10px;
+    top: 20px;
+	content: "";
+    position: absolute;
+}
+
+.content-select select{
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+}
+
+/* Eliminamos la flecha que por defecto aparece en el desplegable */
+.content-select select::-ms-expand{
+    display: none;
+}
+
+.content-select{
+	max-width: 250px;
+	position: relative;
+}
+
+.content-select select{
+	display: inline-block;
+	width: 100%;
+	cursor: pointer;
+  	padding: 7px 10px;
+  	height: 42px;
+  	outline: 0; 
+  	border: 0;
+	border-radius: 0;
+	background:  #d0f5da;
+	font-size: 1em;
+	color: #5486b9;
+	border:2px solid rgba(84,134,185,0.2);
+    border-radius: .25rem;
+}
+
+#btn{
+    display: inline-block;
+    font-weight: 400;
+    color: #5486b9;
+    text-align: center;
+    vertical-align: middle;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background: #d0f5da;
+    border:2px solid rgba(84,134,185,0.2);
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: .25rem;
+    
+}
+
+.content-select select:hover #btn:hover{
+	background: #f4fbf5;
+}
+
+/* 
+Creamos la fecha que aparece a la izquierda del select.
+Realmente este elemento es un cuadrado que sólo tienen
+dos bordes con color y que giramos con transform: rotate(-45deg);
+*/
+
+
+.form-control:focus, .custom-select:focus{
+	border-color: #ced4da;
+	border: 1;
+	box-shadow: none;
+}
+
+/* =============================================================================
+   END INPUT
+   ========================================================================== */
+
+.nav-item>a:hover{
+	background-color: #f4fbf5;
+	border-radius: 0rem 2rem 0rem 2rem;
+}
+.navbar-expand-lg .navbar-nav .dropdown-menu{
+	border-radius: 0rem 4rem;
+	background-color: rgba(255,255,255,.97);
+} 
+
+.dropdown-item{
+	border-radius: 0rem 4rem;
+	width: 95%;
+	padding: 1rem 1.5rem;
+	color: #212121;
+}
+
+.dropdown-menu>a:hover{
+	background-color: #f4fbf5;
+}
+
+.dropdown-toggle::after{
+	display:none;
+}
+
+@media (max-width: 991px){
+	.navbar-nav .nav-link{
+		padding-right: 35px !important;
+		padding-left: 35px !important;
+	}
+	span>.nav-link{
+		display: none;
+	}
+	.social-a>span>.nav-link{
+		display: inline;
+		padding-right: 0 !important;
+		padding-left: 0 !important;
+	}
+	.social-a{
+		margin-left: 200px;
+	}
+}
+
+@media (min-width: 991px){
+	.nav-link{
+		display: inline;
+	}
+	.social-a>span>.nav-link{
+		display: none;
+	}
+
+}
+
+header{
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	/*opacity: 0.3;
+	background: #212121;*/
+}
+
+
+
+span{
+	font-size: 1.5em;
+}
+
+
+
+.fa-twitter:before{
+	color: #55acee;
+}
+
+.fa-facebook-f:before{
+	color: #3c5a99;
+}
+
+.fa-instagram:before{
+	color: #fff;
+}
+
+.custom-control{
+	padding-left: 0;
+}
+.text-morado{
+	color:#900c3f;
+}
+
+.item{
+	display: block;
+}
+.hoja-a{
+	border-radius: 0rem 2rem 0rem 2rem;
+}
+.hoja-b{
+	border-radius: 2rem 0rem 2rem 0rem;
+}
+.t-a{
+	width: 100px;
+}
+
+#logo{
+	width: 190px;
+}
+
+@font-face {
+font-family: 'Omnes Semibold';
+font-style: normal;
+font-weight: normal;
+src: local('Omnes Semibold'), url('font/omnes-semibold-webfont.woff') format('woff');
+}
+
+@font-face {
+font-family: 'Omnes Light';
+font-style: normal;
+font-weight: normal;
+src: local('Omnes Light'), url('omnes_light-webfont.woff') format('woff');
+}
+
+/* =============================================================================
+   PATICLES.JS
+   ========================================================================== */
+
+#particles-js{
+	position: relative;
+	top: 0px;
+	left: 0px;
+	background: #f4fbf5;
+	height: 500px;
+}
+
+/*=============================================================================
+   SCROLL
+   ==========================================================================*/
+
+::-webkit-scrollbar{
+    width: 12px;
+    background-color: #f4fbf5;
+    border-radius: 5rem;
+}
+::-webkit-scrollbar-track{
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    background-color: #f4fbf5;
+    border-radius: 5rem;
+}
+::-webkit-scrollbar-thumb{
+    background-color: #b0f5c47d; 
+    border-radius: 5rem;
+}
+
+p::selection, h1::selection, a::selection {
+    background: #e1f9e8;
+    color: black;
+    text-shadow: 1px 1px #fff;
+}

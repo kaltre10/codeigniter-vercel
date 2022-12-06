@@ -1,0 +1,55 @@
+body{
+	background: #f4fbf5;
+}
+header{
+	background: #fff;
+}
+
+.navbar{
+	background: #fff !important;
+}
+
+.logo{
+	width: 200px;
+}
+
+i{
+	font-size: 20px;
+	color: #3498db;
+}
+.dropdown-toggle{
+	color: #3498db !important;
+}
+.dropleft .dropdown-toggle::before{
+	border-right: 0;
+}
+.breadcrumb{
+	background: none;
+	margin-bottom: -5px;
+}
+.breadcrumb-item.active{
+
+}
+.card{
+	border: 0;
+}
+
+.borde_cambio:after {
+    width: 5px;
+    height: 55px;
+    background: #d0f5da;
+    border-radius: 10px;
+    top: 20px;
+	content: "";
+    position: absolute;
+}
+
+.card-signin{
+	border-radius: 50px 0;
+}
+
+.logo_sesion{
+	margin-top: 70px;
+	margin-bottom: -30px;
+	width: 250px;
+}

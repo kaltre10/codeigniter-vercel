@@ -1,0 +1,251 @@
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+class Reporte_detallado extends CI_Controller {
+
+	public function __construct() {
+		parent::__construct();
+		$this->load->library('session');
+		$this->load->model(array('operaciones_model', 'divisas_model', 'clientes_model', 'ganancia_model', 'ent_sal_model', 'cierre_model', 'cuentas_model'));
+		$this->load->helper(array('reporte/divisas', 'reporte/operaciones'));
+	}
+
+	public function index() {
+		if ($this->session->userdata('isLogged') && $this->session->userdata('rango') == 0
+		|| $this->session->userdata('rango') == 1) {
+
+		if ($this->input->post('desde') && $this->input->post('hasta')) {
+			$desde = $this->input->post('desde') . " 00:00:00";//ajustando la fecha para que tome todo el dia
+			$hasta = $this->input->post('hasta') . " 23:59:59";//ajustando la fecha para que tome todo el dia
+
+			$tipo = $this->input->post('tipo');
+			$mayor = $this->input->post('mayor');
+			$menor = $this->input->post('menor');
+
+			if ($tipo == ""){$tipo = NULL;}
+			if($mayor == ""){$mayor = NULL;}
+			if($menor == ""){$menor = NULL;}
+
+		}else{
+			$desde = date("Y-m-d") . " 00:00:00";//ajustando la fecha para que tome todo el dia
+			$hasta = date("Y-m-d") . " 23:59:59";//ajustando la fecha para que tome todo el dia
+			$tipo = NULL;
+			$mayor = NULL;
+			$menor = NULL;
+		}
+		
+			$data = array(
+				'header' => $this->load->view('admin/header','',TRUE),
+				'footer' => $this->load->view('admin/footer','',TRUE),
+				'nav' => $this->load->view('admin/nav','',TRUE),
+				'operaciones' => $this->operaciones_model->getall($desde, $hasta, $tipo, $mayor, $menor),
+				'cotizaciones' => $this->get_cotizacion()
+			);
+
+			$this->load->view('admin/reporte_detallado', $data);
+		}else{
+			redirect(base_url('login'));
+		}
+		
+	}
+
+	public function anular($id) {
+		if ($this->session->userdata('isLogged') && $this->session->userdata('rango') == 0) {
+
+			$this->operaciones_model->anular($id);
+			redirect(base_url('admin/Reporte_detallado'));
+			
+		}else{
+			redirect(base_url('login'));
+		}
+		
+	}
+
+	public function get_cotizacion(){
+
+		$array_cotizacion = array();
+		
+		$desde = date("Y-m-d") . " 00:00:00";//ajustando la fecha para que tome todo el dia
+		$hasta = date("Y-m-d") . " 23:59:59";//ajustando la fecha para que tome todo el dia
+	
+		$ent_sal = $this->ent_sal_model->getall($desde, $hasta);
+		// $ent_sal = 0;
+		$operaciones = $this->operaciones_model->getall($desde, $hasta);
+		$divisas = $this->divisas_model->getall();
+		$cuentas = $this->cuentas_model->getall();
+
+		//reporte de divisas para calcular y guardar la cotizacion
+		$array = operaciones_diarias($divisas, $operaciones, $ent_sal);
+		$suma_gastos_compra = 0; 
+		$cotizacion = 0;
+
+		//CALCULAMOS DIA ANTERIOR QUE TENGA REGISTROS DE CIERRE
+		$d = date("Y-m-d 00:00:00", strtotime('-1 day', time()));
+		$h = date("Y-m-d 23:59:59", strtotime('-1 day', time()));
+		$cierre = $this->cierre_model->getall($d, $h);	
+		$i = 1;
+		$suma = 0;
+
+		$hay_datos = $this->cierre_model->get();
+		if (!$cierre) {
+			while (!$cierre && count($hay_datos) > 0 && $hay_datos[0]->fec_cierre != date('Y-m-d')) {
+				$d = date("Y-m-d 00:00:00", strtotime("-$i day", time()));
+				$h = date("Y-m-d 23:59:59", strtotime("-1 day", time()));
+				$cierre = $this->cierre_model->getall($d, $h);
+				$i++;	
+			}
+			
+		
+		}
+
+		$ganancia = sumar_divisa($divisas, $operaciones, $ent_sal, $cuentas, $cierre);
+
+		//calculo de los 5 ultimos cierres
+		$index = 0;
+		$cierres = [];
+		if(count($hay_datos) > 0){
+			$row = array_column($hay_datos, 'fec_cierre'); //primer registro 
+			$row[0]; //primera fecha del cierre insertado para detener el while
+			do {
+				$d = date("Y-m-d", strtotime("-$index day", time()));
+				$h = date("Y-m-d", strtotime("-$index day", time()));
+				$cierreDay = $this->cierre_model->getall($d, $h);
+				
+				if($cierreDay){;
+					array_push($cierres, $cierreDay);
+				}
+
+				$index++;
+				
+			} while ($row[0] != $d && count($cierres) <= 5);
+		}
+	
+		$ope_cotizacion = operaciones_diarias($divisas, $operaciones, $ent_sal);
+		
+		if(!$cierres){
+			$cierres = 0;
+		}
+		
+		$suma_gastos_compra = 0; 
+		$porcentaje_anterior = 0;
+		$porcentaje_actual = 0;
+		$cot_anterior = 0; //peso del valor porcentual
+		$cot_actual = 0; //peso del valor porcentual
+		$index = 0;
+		$cotizacion = 0;
+		$cot = 0;
+
+		foreach ($ganancia as $key){
+		
+			if ($key['caja'] == 0) {
+				continue;
+			}
+
+			//asignamos primero la cotizacion registrada en el sistema
+			$cot = $key["cotizacion"];
+			
+			if($cierres != 0){
+				$last_date = $cierres[0][array_key_last($cierres)]->fec_cierre;
+
+				$result = array_filter($cierres, function($a) {
+				  return $a == $last_date;
+				}, ARRAY_FILTER_USE_KEY);
+
+			}else{
+				$result = $cierres;
+			}
+			
+			foreach ($result as $cie){
+				
+				if($cie[$index]->cod_divisa_cierre === $key["codigo"]){
+					
+				  foreach ($ope_cotizacion as $arr){
+					
+					//asignamos la cotizacion del cierre anterior si es la misma divisa 
+					if($arr['codigo'] == $key["codigo"]){ 
+						$cot = $cie[$index]->cot_cierre;
+					}
+					
+					  if ( $arr['compras'] == 0){
+						continue;
+					  } 
+					  if($arr['codigo'] == $key["codigo"]){
+
+						$caja_sal_ent = 0;
+						//salidas y entradas
+						foreach($ent_sal as $ent){
+	
+							if($ent->cod_divisa == $key['codigo'] && $ent->tip_ent_sal == 'Entrada'){
+						
+								$caja_sal_ent = $caja_sal_ent + $ent->can_ent_sal;
+								
+							}
+	
+							if($ent->cod_divisa == $key['codigo'] && $ent->tip_ent_sal == 'Salida'){
+										
+								$caja_sal_ent = $caja_sal_ent - $ent->can_ent_sal; 
+							
+							}
+	
+						}
+
+						$base = 100;
+						$porcentaje_anterior = ($cie[$index]->compra_cierre * $base)/($cie[$index]->compra_cierre + $arr['compras']);
+						$porcentaje_actual = ($arr['compras'] * $base)/($cie[$index]->compra_cierre + $arr['compras']);
+						$cot_anterior = ($cie[$index]->cot_cierre * $porcentaje_anterior) / $base;
+						$cot_actual = (($arr['gastos_compra']/$arr['compras']) * $porcentaje_actual) / $base;
+						$cot = $cot_anterior + $cot_actual;
+
+						//verificamos si ya se hizo el cierre del dia
+						if($cie[$index]->fec_cierre == date('Y-m-d')){
+						  $cot = $cie[$index]->cot_cierre;
+						}
+						
+					  }
+					 
+				  }
+				
+				}
+				
+				//si no hay compras en el dia y la cotizacion es 0 se iguala al cierre anterior
+				if(!$cot){
+			 
+				  $cot = $cie[$index]->cot_cierre;
+				  
+				}
+				
+				$index++;
+			  }
+	  
+			 
+			  //si la divisa es soles igualamos a 1 la cotizacion
+			  if($key['codigo'] === 'PEN'){
+				$cot = 1;
+			  } 
+			 
+			 //si no hay cierre anterior(primer dia)
+			if($cierres === 0){
+				
+			  $cot = $key["cotizacion"];
+			  foreach ($ope_cotizacion as $arr){
+		
+				if ( $arr['compras'] == 0){
+
+				  continue;
+				} 
+			
+				if($arr['codigo'] == $key["codigo"] && $key["cotizacion"] > 0){
+				
+				  $cot = str_pad(round($arr['gastos_compra'] / $arr['compras'] , 4), 4);
+				}
+			  }
+			 
+			}
+			// echo $cot . "-" . $key['codigo'] . "<br>";
+			array_push($array_cotizacion, array('codigo' => $key['codigo'], 'cotizacion' => $cot));
+		}
+		// print_r($array_cotizacion);
+		return $array_cotizacion;
+	}
+
+}
