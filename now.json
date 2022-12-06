@@ -3,7 +3,7 @@
 	"public": true,
 	"functions": {
 	"api/*.php": {
-		"runtime": "now-php@0.0.9"
+		"runtime": "vercel-php@0.3.2"
 	}
 	},
 	"routes": [
